@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Elder Registration</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+      min-height: 100vh;
+      background: linear-gradient(135deg, #dbeafe 0%, #f0fdf4 100%);
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    body::before,
+    body::after {
+      content: '';
+      position: absolute;
+      border-radius: 50%;
+      opacity: 0.3;
+      z-index: -1;
+      animation: float 12s infinite alternate ease-in-out;
+    }
+
+    body::before {
+      width: 80vw;
+      height: 80vw;
+      background: #93c5fd;
+      top: -40vw;
+      left: -40vw;
+    }
+
+    body::after {
+      width: 70vw;
+      height: 70vw;
+      background: #a7f3d0;
+      bottom: -35vw;
+      right: -35vw;
+    }
+
+    @keyframes float {
+      0% { transform: scale(1) translateY(0); }
+      100% { transform: scale(1.1) translateY(-20px); }
+    }
+
+    .container {
+      max-width: 600px;
+      margin: 5vh auto;
+      background: white;
+      padding: 2rem;
+      border-radius: 16px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+      z-index: 1;
+      position: relative;
+      width: 90%;
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 1.5rem;
+      font-size: 1.8rem;
+    }
+
+    label {
+      display: block;
+      margin-top: 1rem;
+      font-size: 0.95rem;
+    }
+
+    input, textarea, select {
+      width: 100%;
+      padding: 0.75rem;
+      margin-top: 0.5rem;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      font-size: 1rem;
+      box-sizing: border-box;
+    }
+
+    button {
+      margin-top: 1.5rem;
+      width: 100%;
+      padding: 0.75rem;
+      background-color: #10b981;
+      color: white;
+      font-size: 1rem;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #059669;
+    }
+
+    .message {
+      margin-top: 1rem;
+      text-align: center;
+      font-weight: bold;
+      font-size: 1rem;
+    }
+
+    @media (max-width: 480px) {
+      h2 {
+        font-size: 1.5rem;
+      }
+
+      input, textarea {
+        font-size: 0.95rem;
+      }
+
+      button {
+        font-size: 0.95rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h2>Elder Registration</h2>
+  <form id="elderForm">
+    <label>Full Name
+      <input type="text" name="full_name" required>
+    </label>
+    <label>Date of Birth
+      <input type="date" name="date_of_birth" required>
+    </label>
+    <label>Phone Number
+      <input type="tel" name="phone_number" required>
+    </label>
+    <label>Email Address
+      <input type="email" name="email" required>
+    </label>
+    <label>Address
+      <textarea name="address" required></textarea>
+    </label>
+    <label>Preferred Language
+      <input type="text" name="language_preference" required>
+    </label>
+    <label>Emergency Contact
+      <input type="text" name="emergency_contact" required>
+    </label>
+    <label>Needs (comma-separated)
+      <input type="text" name="needs" placeholder="e.g., Companionship, Tech Help">
+    </label>
+    <label>Medical History
+      <textarea name="medical_history" placeholder="Any relevant medical info..."></textarea>
+    </label>
+    <label>Occupation
+      <input type="text" name="occupation">
+    </label>
+    <button type="submit">Register</button>
+    <div class="message" id="formMessage"></div>
+  </form>
+</div>
+
+<!-- jQuery CDN -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script>
+  $('#elderForm').on('submit', function(e) {
+    e.preventDefault();
+
+    const formData = {
+      full_name: $('input[name="full_name"]').val(),
+      date_of_birth: $('input[name="date_of_birth"]').val(),
+      phone_number: $('input[name="phone_number"]').val(),
+      email: $('input[name="email"]').val(),
+      address: $('textarea[name="address"]').val(),
+      language_preference: $('input[name="language_preference"]').val(),
+      emergency_contact: $('input[name="emergency_contact"]').val(),
+      needs: $('input[name="needs"]').val(),
+      medical_history: $('textarea[name="medical_history"]').val(),
+      occupation: $('input[name="occupation"]').val()
+    };
+
+    $.ajax({
+      url: 'https://px2ky2ieduows2hw623sm2ye5y0qmlqa.lambda-url.us-east-1.on.aws/',
+      type: 'POST',
+      contentType: 'application/json',
+      data: JSON.stringify(formData),
+      beforeSend: function () {
+        $('button').prop('disabled', true).text('Registering...');
+      },
+      success: function(response) {
+        $('#formMessage').css('color', 'green').text('Elder registered successfully!');
+        $('#elderForm')[0].reset();
+        console.log("✅ Response:", response);
+      },
+      error: function(xhr) {
+        $('#formMessage').css('color', 'red').text('Registration failed. Please try again.');
+        console.error("❌ Error:", xhr.responseText);
+      },
+      complete: function () {
+        $('button').prop('disabled', false).text('Register');
+      }
+    });
+  });
+</script>
+
+</body>
+</html>
