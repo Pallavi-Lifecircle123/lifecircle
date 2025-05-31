@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Volunteer Registration</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #e0f2fe 0%, #f0fdf4 100%);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    body::before, body::after {
+      content: '';
+      position: absolute;
+      border-radius: 50%;
+      opacity: 0.25;
+      z-index: -1;
+      animation: float 15s infinite alternate ease-in-out;
+    }
+
+    body::before {
+      width: 70vw;
+      height: 70vw;
+      background: #93c5fd;
+      top: -30vw;
+      left: -30vw;
+    }
+
+    body::after {
+      width: 60vw;
+      height: 60vw;
+      background: #a7f3d0;
+      bottom: -30vw;
+      right: -30vw;
+    }
+
+    @keyframes float {
+      0% { transform: scale(1) translateY(0); }
+      100% { transform: scale(1.05) translateY(-20px); }
+    }
+
+    .container {
+      max-width: 650px;
+      margin: 5vh auto;
+      background: white;
+      padding: 2rem;
+      border-radius: 16px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+      position: relative;
+      z-index: 1;
+    }
+
+    h2 {
+      text-align: center;
+      font-size: 1.8rem;
+      margin-bottom: 1.5rem;
+    }
+
+    label {
+      display: block;
+      margin-top: 1rem;
+      font-size: 0.95rem;
+    }
+
+    input, textarea, select {
+      width: 100%;
+      padding: 0.75rem;
+      margin-top: 0.4rem;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 1rem;
+      box-sizing: border-box;
+    }
+
+    textarea {
+      resize: vertical;
+    }
+
+    .radio-group {
+      margin-top: 0.5rem;
+    }
+
+    .radio-group label {
+      display: inline-block;
+      margin-right: 1rem;
+      font-weight: normal;
+    }
+
+    button {
+      margin-top: 1.8rem;
+      width: 100%;
+      padding: 0.9rem;
+      background-color: #10b981;
+      color: white;
+      font-size: 1rem;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #059669;
+    }
+
+    .message {
+      margin-top: 1rem;
+      text-align: center;
+      font-weight: bold;
+      font-size: 1rem;
+    }
+
+    @media (max-width: 500px) {
+      .container {
+        margin: 3vh 1rem;
+        padding: 1.5rem;
+      }
+
+      h2 {
+        font-size: 1.5rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h2>Volunteer Registration</h2>
+  <form id="volunteerForm">
+    <label>Full Name
+      <input type="text" name="full_name" required>
+    </label>
+    <label>Date of Birth
+      <input type="date" name="date_of_birth" required>
+    </label>
+    <label>Address
+      <textarea name="address" required></textarea>
+    </label>
+    <label>Preferred Language
+      <input type="text" name="language_preference" required>
+    </label>
+    <label>Availability
+      <input type="text" name="availability" placeholder="e.g., Weekdays, Weekends">
+    </label>
+    <label>Skills (comma-separated)
+      <input type="text" name="skills" placeholder="e.g., First Aid, Driving, Tech Support">
+    </label>
+    <label>Are you a paid gig worker or a volunteer?</label>
+    <div class="radio-group">
+      <label><input type="radio" name="is_paid_worker" value="false" checked> Volunteer</label>
+      <label><input type="radio" name="is_paid_worker" value="true"> Gig Worker</label>
+    </div>
+    <label>Short Bio
+      <textarea name="bio" placeholder="Tell us about yourself..."></textarea>
+    </label>
+
+    <input type="hidden" name="verification_status" value="pending">
+
+    <button type="submit">Submit</button>
+    <div class="message" id="formMessage"></div>
+  </form>
+</div>
+
+<!-- jQuery CDN -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+  $('#volunteerForm').on('submit', function (e) {
+    e.preventDefault();
+
+    const formData = {
+      full_name: $('input[name="full_name"]').val(),
+      date_of_birth: $('input[name="date_of_birth"]').val(),
+      address: $('textarea[name="address"]').val(),
+      language_preference: $('input[name="language_preference"]').val(),
+      availability: $('input[name="availability"]').val(),
+      skills: $('input[name="skills"]').val(),
+      is_paid_worker: $('input[name="is_paid_worker"]:checked').val() === "true",
+      bio: $('textarea[name="bio"]').val(),
+      verification_status: $('input[name="verification_status"]').val()
+    };
+
+    $.ajax({
+      url: 'https://6677zcnljy4kjnwcozsiwj5jeu0toike.lambda-url.us-east-1.on.aws/', // 🔁 Replace with actual URL
+      type: 'POST',
+      contentType: 'application/json',
+      data: JSON.stringify(formData),
+      beforeSend: function () {
+        $('button').prop('disabled', true).text('Submitting...');
+      },
+      success: function (response) {
+        $('#formMessage').css('color', 'green').text('Volunteer registered successfully!');
+        $('#volunteerForm')[0].reset();
+        console.log("✅ Response:", response);
+      },
+      error: function (xhr) {
+        $('#formMessage').css('color', 'red').text('Submission failed. Please try again.');
+        console.error("❌ Error:", xhr.responseText);
+      },
+      complete: function () {
+        $('button').prop('disabled', false).text('Submit');
+      }
+    });
+  });
+</script>
+
+</body>
+</html>
