@@ -1,20 +1,61 @@
 const express = require('express');
+const mongoose = require('mongoose');
 const cors = require('cors');
-const connectDB = require('./config/database');
+const dotenv = require('dotenv');
 const authRoutes = require('./routes/auth');
 const requestRoutes = require('./routes/requests');
 const volunteerRoutes = require('./routes/volunteers');
-require('dotenv').config();
+
+dotenv.config();
 
 const app = express();
 
 // Middleware
 app.use(cors());
 app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
 
-// Connect to MongoDB
-connectDB();
+// MongoDB Connection with improved error handling
+const connectDB = async () => {
+    try {
+        const conn = await mongoose.connect(process.env.MONGODB_URI, {
+            useNewUrlParser: true,
+            useUnifiedTopology: true,
+            serverSelectionTimeoutMS: 5000,
+            socketTimeoutMS: 45000,
+            retryWrites: true,
+            w: 'majority',
+            maxPoolSize: 10,
+            minPoolSize: 5,
+            maxIdleTimeMS: 30000,
+            connectTimeoutMS: 10000,
+        });
+        console.log(`MongoDB Connected: ${conn.connection.host}`);
+        
+        // Handle connection errors after initial connection
+        mongoose.connection.on('error', (err) => {
+            console.error('MongoDB connection error:', err);
+            // Don't crash the app, just log the error
+        });
+
+        mongoose.connection.on('disconnected', () => {
+            console.log('MongoDB disconnected. Attempting to reconnect...');
+            setTimeout(connectDB, 5000);
+        });
+
+        mongoose.connection.on('reconnected', () => {
+            console.log('MongoDB reconnected successfully');
+        });
+
+    } catch (error) {
+        console.error('MongoDB Connection Error:', error.message);
+        console.log('Connection String:', process.env.MONGODB_URI.replace(/:[^:@]+@/, ':****@'));
+        console.log('Please make sure:');
+        console.log('1. Your IP address is whitelisted in MongoDB Atlas');
+        console.log('2. The connection string is correct');
+        console.log('3. The database user has correct permissions');
+        // Don't exit the process, just log the error
+    }
+};
 
 // Routes
 app.use('/api/auth', authRoutes);
@@ -34,6 +75,55 @@ app.use((err, req, res, next) => {
 
 // Start server
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
-}); 
+let server;
+
+const startServer = async () => {
+    try {
+        server = app.listen(PORT, () => {
+            console.log(`Server is running on port ${PORT}`);
+            connectDB();
+        });
+
+        // Handle server errors
+        server.on('error', (error) => {
+            if (error.code === 'EADDRINUSE') {
+                console.error(`Port ${PORT} is already in use. Please try a different port.`);
+                process.exit(1);
+            } else {
+                console.error('Server error:', error);
+            }
+        });
+
+    } catch (error) {
+        console.error('Failed to start server:', error);
+        process.exit(1);
+    }
+};
+
+// Handle server shutdown gracefully
+process.on('SIGTERM', () => {
+    console.log('SIGTERM received. Shutting down gracefully...');
+    if (server) {
+        server.close(() => {
+            console.log('Server closed');
+            mongoose.connection.close(false, () => {
+                console.log('MongoDB connection closed');
+                process.exit(0);
+            });
+        });
+    }
+});
+
+// Handle uncaught exceptions
+process.on('uncaughtException', (error) => {
+    console.error('Uncaught Exception:', error);
+    // Don't exit the process, just log the error
+});
+
+// Handle unhandled promise rejections
+process.on('unhandledRejection', (error) => {
+    console.error('Unhandled Rejection:', error);
+    // Don't exit the process, just log the error
+});
+
+startServer(); 

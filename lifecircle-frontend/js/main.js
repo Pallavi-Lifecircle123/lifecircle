@@ -18,9 +18,16 @@ $('#loginForm').on('submit', function(e) {
     }
 
     $.ajax({
-        url: `${API_BASE_URL}/auth/login`,
+        url: `${API_CONFIG.BASE_URL}/auth/login`,
         method: 'POST',
-        contentType: 'application/json',
+        headers: {
+            ...API_CONFIG.HEADERS,
+            'Accept': 'application/json'
+        },
+        xhrFields: {
+            withCredentials: true
+        },
+        crossDomain: true,
         data: JSON.stringify(formData),
         success: function(response) {
             // Store token and user type
@@ -28,13 +35,14 @@ $('#loginForm').on('submit', function(e) {
             localStorage.setItem('userType', formData.userType);
             
             // Redirect based on user type
-            if (formData.userType === 'elder') {
+            if (formData.userType === USER_ROLES.ELDER) {
                 window.location.href = 'elder-dashboard.html';
-            } else {
+            } else if (formData.userType === USER_ROLES.VOLUNTEER) {
                 window.location.href = 'volunteer-dashboard.html';
             }
         },
-        error: function(xhr) {
+        error: function(xhr, status, error) {
+            console.error('Login error:', {xhr, status, error});
             alert(xhr.responseJSON?.message || 'Login failed. Please try again.');
         }
     });
@@ -59,16 +67,24 @@ $('#registerForm').on('submit', function(e) {
     }
 
     $.ajax({
-        url: `${API_BASE_URL}/auth/register`,
+        url: `${API_CONFIG.BASE_URL}/auth/register`,
         method: 'POST',
-        contentType: 'application/json',
+        headers: {
+            ...API_CONFIG.HEADERS,
+            'Accept': 'application/json'
+        },
+        xhrFields: {
+            withCredentials: true
+        },
+        crossDomain: true,
         data: JSON.stringify(formData),
         success: function(response) {
             alert('Registration successful! Please login.');
             $('#registerModal').modal('hide');
             $('#loginModal').modal('show');
         },
-        error: function(xhr) {
+        error: function(xhr, status, error) {
+            console.error('Registration error:', {xhr, status, error});
             alert(xhr.responseJSON?.message || 'Registration failed. Please try again.');
         }
     });
