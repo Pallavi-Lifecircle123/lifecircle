@@ -2,6 +2,8 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const dotenv = require('dotenv');
+// Remove serverless-http as it's not used for EC2 deployment
+// const serverless = require('serverless-http');
 const authRoutes = require('./routes/auth');
 const requestRoutes = require('./routes/requests');
 const volunteerRoutes = require('./routes/volunteers');
@@ -12,7 +14,7 @@ const app = express();
 
 // CORS configuration
 const corsOptions = {
-    origin: ['https://thelifecircle.ca', 'https://api.thelifecircle.ca', 'http://localhost:3000'],
+    origin: ['https://thelifecircle.ca', 'https://api.thelifecircle.ca', 'https://beta.thelifecircle.ca', 'http://localhost:3000'],
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
     allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: true
@@ -28,14 +30,14 @@ const connectDB = async () => {
         const conn = await mongoose.connect(process.env.MONGODB_URI, {
             useNewUrlParser: true,
             useUnifiedTopology: true,
-            serverSelectionTimeoutMS: 5000,
+            serverSelectionTimeoutMS: 5000, // Increase timeout if needed
             socketTimeoutMS: 45000,
             retryWrites: true,
             w: 'majority',
             maxPoolSize: 10,
             minPoolSize: 5,
             maxIdleTimeMS: 30000,
-            connectTimeoutMS: 10000,
+            connectTimeoutMS: 10000, // Increase timeout if needed
         });
         console.log(`MongoDB Connected: ${conn.connection.host}`);
         
@@ -46,7 +48,8 @@ const connectDB = async () => {
 
         mongoose.connection.on('disconnected', () => {
             console.log('MongoDB disconnected. Attempting to reconnect...');
-            setTimeout(connectDB, 5000);
+            // Consider a more robust reconnection strategy for production
+             setTimeout(connectDB, 5000); 
         });
 
         mongoose.connection.on('reconnected', () => {
@@ -55,11 +58,13 @@ const connectDB = async () => {
 
     } catch (error) {
         console.error('MongoDB Connection Error:', error.message);
-        console.log('Connection String:', process.env.MONGODB_URI.replace(/:[^:@]+@/, ':****@'));
+        console.log('Connection String:', process.env.MONGODB_URI ? process.env.MONGODB_URI.replace(/:[^:@]+@/, ':****@') : 'Not configured');
         console.log('Please make sure:');
         console.log('1. Your IP address is whitelisted in MongoDB Atlas');
-        console.log('2. The connection string is correct');
+        console.log('2. The connection string is correct in your .env file');
         console.log('3. The database user has correct permissions');
+        // Exit if database connection fails on startup
+        // process.exit(1); // Uncommenting this can prevent server from running without DB
     }
 };
 
@@ -74,7 +79,7 @@ app.get('/', (req, res) => {
         message: 'Welcome to The Life Circle API',
         version: '1.0.0',
         status: 'active',
-        domain: 'api.thelifecircle.ca'
+        domain: req.headers.host // Use req.headers.host to show the domain accessed
     });
 });
 
@@ -84,7 +89,7 @@ app.get('/health', (req, res) => {
         status: 'healthy',
         timestamp: new Date().toISOString(),
         mongodb: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected',
-        domain: 'api.thelifecircle.ca'
+        domain: req.headers.host // Use req.headers.host to show the domain accessed
     });
 });
 
@@ -99,7 +104,15 @@ app.use((err, req, res, next) => {
 
 // Start server
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
-    connectDB();
-}); 
+
+// Connect to MongoDB before starting the server
+connectDB().then(() => {
+    app.listen(PORT, () => {
+        console.log(`Server is running on port ${PORT}`);
+    });
+}).catch(err => {
+    console.error('Failed to connect to MongoDB, server not started:', err.message);
+});
+
+// Removed Lambda handler as it's not for EC2 deployment
+// module.exports.handler = async (event, context) => { ... }; 
