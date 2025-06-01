@@ -6,24 +6,24 @@ body {
     font-family: var(--font-primary);
     line-height: 1.6;
     color: var(--color-dark);
-    background-color: var(--color-light);
+    background-color: #f8f9fa;
 }
 
 :root {
-    --color-primary: #4A90E2;
-    --color-secondary: #50C878;
-    --color-accent: #FFB74D;
-    --color-dark: #333333;
-    --color-light: #F5F5F5;
+    --color-primary: #2c3e50;      /* The Life Circle's primary blue */
+    --color-secondary: #27ae60;    /* The Life Circle's green */
+    --color-accent: #e67e22;       /* The Life Circle's orange */
+    --color-dark: #2c3e50;         /* Dark blue for text */
+    --color-light: #f8f9fa;        /* Light gray background */
     --color-white: #FFFFFF;
-    --color-gray: #666666;
+    --color-gray: #6c757d;         /* Medium gray */
     --font-primary: 'Inter', Arial, sans-serif;
     --font-secondary: 'Roboto', Arial, sans-serif;
 }
 
 /* Hero Section */
 .hero-section {
-    background-color: var(--color-white);
+    background: linear-gradient(135deg, rgba(44, 62, 80, 0.1) 0%, rgba(39, 174, 96, 0.1) 100%);
     padding: 100px 0;
     position: relative;
     overflow: hidden;
@@ -36,7 +36,7 @@ body {
     left: 0;
     right: 0;
     bottom: 0;
-    background: linear-gradient(135deg, rgba(74, 144, 226, 0.1) 0%, rgba(80, 200, 120, 0.1) 100%);
+    background: linear-gradient(135deg, rgba(44, 62, 80, 0.05) 0%, rgba(39, 174, 96, 0.05) 100%);
     z-index: 0;
 }
 
@@ -59,7 +59,7 @@ body {
 .card {
     border: none;
     border-radius: 12px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
     transition: transform 0.3s ease, box-shadow 0.3s ease;
     background-color: var(--color-white);
 }
@@ -79,14 +79,15 @@ body {
 /* Forms */
 .form-control {
     border-radius: 8px;
-    border: 1px solid #E0E0E0;
+    border: 1px solid #e5e7eb;
     padding: 12px;
     font-size: 1rem;
+    background-color: var(--color-white);
 }
 
 .form-control:focus {
     border-color: var(--color-primary);
-    box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
 }
 
 .form-label {
@@ -109,8 +110,8 @@ body {
 }
 
 .btn-primary:hover {
-    background-color: #357ABD;
-    border-color: #357ABD;
+    background-color: #1d4ed8;
+    border-color: #1d4ed8;
     transform: translateY(-2px);
 }
 
@@ -134,7 +135,7 @@ body {
 
 .modal-header {
     background-color: var(--color-white);
-    border-bottom: 1px solid #E0E0E0;
+    border-bottom: 1px solid #e5e7eb;
     padding: 1.5rem;
 }
 
@@ -191,7 +192,7 @@ body {
 }
 
 .list-group-item:hover {
-    background-color: rgba(74, 144, 226, 0.1);
+    background-color: rgba(37, 99, 235, 0.1);
 }
 
 .list-group-item.active {

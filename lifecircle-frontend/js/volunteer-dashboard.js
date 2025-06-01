@@ -1,5 +1,5 @@
-// API Base URL
-const API_BASE_URL = 'http://localhost:3000/api';
+// Remove the hardcoded API_BASE_URL and use the one from config.js
+// const API_BASE_URL = 'http://localhost:3000/api';
 
 // Check Authentication
 function checkAuth() {
@@ -20,9 +20,10 @@ function checkAuth() {
 // Load User Data
 function loadUserData() {
     $.ajax({
-        url: `${API_BASE_URL}/auth/me`,
+        url: `${window.API_CONFIG.BASE_URL}/auth/me`,
         method: 'GET',
         headers: {
+            ...window.API_CONFIG.HEADERS,
             'Authorization': `Bearer ${localStorage.getItem('token')}`
         },
         success: function(response) {
@@ -39,9 +40,10 @@ function loadUserData() {
 // Load Profile
 function loadProfile() {
     $.ajax({
-        url: `${API_BASE_URL}/volunteers/profile`,
+        url: `${window.API_CONFIG.BASE_URL}/volunteers/profile`,
         method: 'GET',
         headers: {
+            ...window.API_CONFIG.HEADERS,
             'Authorization': `Bearer ${localStorage.getItem('token')}`
         },
         success: function(response) {
@@ -63,16 +65,17 @@ function loadAvailableRequests() {
     $('.list-group-item:first').addClass('active');
 
     $.ajax({
-        url: `${API_BASE_URL}/requests/available`,
+        url: `${window.API_CONFIG.BASE_URL}/requests/available`,
         method: 'GET',
         headers: {
+            ...window.API_CONFIG.HEADERS,
             'Authorization': `Bearer ${localStorage.getItem('token')}`
         },
         success: function(response) {
             displayAvailableRequests(response);
         },
         error: function(xhr) {
-            alert('Failed to load requests: ' + (xhr.responseJSON?.message || 'Please try again'));
+            alert(xhr.responseJSON?.message || 'Failed to load requests');
         }
     });
 }
@@ -84,9 +87,10 @@ function loadMyAssignments() {
     $('.list-group-item:eq(1)').addClass('active');
 
     $.ajax({
-        url: `${API_BASE_URL}/requests/my-assignments`,
+        url: `${window.API_CONFIG.BASE_URL}/requests/my-assignments`,
         method: 'GET',
         headers: {
+            ...window.API_CONFIG.HEADERS,
             'Authorization': `Bearer ${localStorage.getItem('token')}`
         },
         success: function(response) {
@@ -204,9 +208,10 @@ function getStatusClass(status) {
 // Assign to Request
 function assignToRequest(requestId) {
     $.ajax({
-        url: `${API_BASE_URL}/requests/${requestId}/assign`,
+        url: `${window.API_CONFIG.BASE_URL}/requests/${requestId}/assign`,
         method: 'POST',
         headers: {
+            ...window.API_CONFIG.HEADERS,
             'Authorization': `Bearer ${localStorage.getItem('token')}`
         },
         success: function() {
@@ -243,9 +248,10 @@ $('#profileForm').on('submit', function(e) {
         
         // Upload file first
         $.ajax({
-            url: `${API_BASE_URL}/volunteers/background-check`,
+            url: `${window.API_CONFIG.BASE_URL}/volunteers/background-check`,
             method: 'POST',
             headers: {
+                ...window.API_CONFIG.HEADERS,
                 'Authorization': `Bearer ${localStorage.getItem('token')}`
             },
             data: formData,
@@ -267,9 +273,10 @@ $('#profileForm').on('submit', function(e) {
 // Update Profile
 function updateProfile(profileData) {
     $.ajax({
-        url: `${API_BASE_URL}/volunteers/profile`,
+        url: `${window.API_CONFIG.BASE_URL}/volunteers/profile`,
         method: 'POST',
         headers: {
+            ...window.API_CONFIG.HEADERS,
             'Authorization': `Bearer ${localStorage.getItem('token')}`,
             'Content-Type': 'application/json'
         },
@@ -295,9 +302,10 @@ $('#updateStatusForm').on('submit', function(e) {
     };
 
     $.ajax({
-        url: `${API_BASE_URL}/requests/${requestId}/status`,
+        url: `${window.API_CONFIG.BASE_URL}/requests/${requestId}/status`,
         method: 'PATCH',
         headers: {
+            ...window.API_CONFIG.HEADERS,
             'Authorization': `Bearer ${localStorage.getItem('token')}`,
             'Content-Type': 'application/json'
         },

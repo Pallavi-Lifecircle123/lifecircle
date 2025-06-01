@@ -2,6 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const dotenv = require('dotenv');
+const serverless = require('serverless-http');
 const authRoutes = require('./routes/auth');
 const requestRoutes = require('./routes/requests');
 const volunteerRoutes = require('./routes/volunteers');
@@ -10,8 +11,16 @@ dotenv.config();
 
 const app = express();
 
+// CORS configuration
+const corsOptions = {
+    origin: ['https://thelifecircle.ca', 'https://api.thelifecircle.ca', 'http://localhost:3000'],
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    credentials: true
+};
+
 // Middleware
-app.use(cors());
+app.use(cors(corsOptions));
 app.use(express.json());
 
 // MongoDB Connection with improved error handling
@@ -34,7 +43,6 @@ const connectDB = async () => {
         // Handle connection errors after initial connection
         mongoose.connection.on('error', (err) => {
             console.error('MongoDB connection error:', err);
-            // Don't crash the app, just log the error
         });
 
         mongoose.connection.on('disconnected', () => {
@@ -53,7 +61,6 @@ const connectDB = async () => {
         console.log('1. Your IP address is whitelisted in MongoDB Atlas');
         console.log('2. The connection string is correct');
         console.log('3. The database user has correct permissions');
-        // Don't exit the process, just log the error
     }
 };
 
@@ -64,66 +71,56 @@ app.use('/api/volunteers', volunteerRoutes);
 
 // Basic route
 app.get('/', (req, res) => {
-    res.json({ message: 'Welcome to The Life Circle API' });
+    res.json({ 
+        message: 'Welcome to The Life Circle API',
+        version: '1.0.0',
+        status: 'active',
+        domain: 'api.thelifecircle.ca'
+    });
+});
+
+// Health check endpoint
+app.get('/health', (req, res) => {
+    res.json({
+        status: 'healthy',
+        timestamp: new Date().toISOString(),
+        mongodb: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected',
+        domain: 'api.thelifecircle.ca'
+    });
 });
 
 // Error handling middleware
 app.use((err, req, res, next) => {
     console.error(err.stack);
-    res.status(500).json({ error: 'Something went wrong!' });
+    res.status(500).json({ 
+        error: 'Something went wrong!',
+        message: process.env.NODE_ENV === 'development' ? err.message : undefined
+    });
 });
+
+// Lambda handler
+const handler = serverless(app);
 
 // Start server
 const PORT = process.env.PORT || 3000;
-let server;
-
-const startServer = async () => {
-    try {
-        server = app.listen(PORT, () => {
-            console.log(`Server is running on port ${PORT}`);
-            connectDB();
-        });
-
-        // Handle server errors
-        server.on('error', (error) => {
-            if (error.code === 'EADDRINUSE') {
-                console.error(`Port ${PORT} is already in use. Please try a different port.`);
-                process.exit(1);
-            } else {
-                console.error('Server error:', error);
-            }
-        });
-
-    } catch (error) {
-        console.error('Failed to start server:', error);
-        process.exit(1);
-    }
-};
-
-// Handle server shutdown gracefully
-process.on('SIGTERM', () => {
-    console.log('SIGTERM received. Shutting down gracefully...');
-    if (server) {
-        server.close(() => {
-            console.log('Server closed');
-            mongoose.connection.close(false, () => {
-                console.log('MongoDB connection closed');
-                process.exit(0);
-            });
-        });
-    }
+app.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
+    connectDB();
 });
 
-// Handle uncaught exceptions
-process.on('uncaughtException', (error) => {
-    console.error('Uncaught Exception:', error);
-    // Don't exit the process, just log the error
-});
-
-// Handle unhandled promise rejections
-process.on('unhandledRejection', (error) => {
-    console.error('Unhandled Rejection:', error);
-    // Don't exit the process, just log the error
-});
-
-startServer(); 
+// Export handler for Lambda
+module.exports.handler = async (event, context) => {
+    // Connect to MongoDB before handling the request
+    await connectDB();
+    
+    // Add CORS headers for Lambda
+    const response = await handler(event, context);
+    return {
+        ...response,
+        headers: {
+            ...response.headers,
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Credentials': true,
+        },
+    };
+}; 

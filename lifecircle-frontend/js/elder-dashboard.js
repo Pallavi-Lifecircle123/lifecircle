@@ -1,5 +1,5 @@
-// API Base URL
-const API_BASE_URL = 'http://localhost:3000/api';
+// Remove the hardcoded API_BASE_URL and use the one from config.js
+// const API_BASE_URL = 'http://localhost:3000/api';
 
 // Check Authentication
 function checkAuth() {
@@ -20,9 +20,10 @@ function checkAuth() {
 // Load User Data
 function loadUserData() {
     $.ajax({
-        url: `${API_BASE_URL}/auth/me`,
+        url: `${window.API_CONFIG.BASE_URL}/auth/me`,
         method: 'GET',
         headers: {
+            ...window.API_CONFIG.HEADERS,
             'Authorization': `Bearer ${localStorage.getItem('token')}`
         },
         success: function(response) {
@@ -37,16 +38,17 @@ function loadUserData() {
 // Load My Requests
 function loadMyRequests() {
     $.ajax({
-        url: `${API_BASE_URL}/requests/my-requests`,
+        url: `${window.API_CONFIG.BASE_URL}/requests/my-requests`,
         method: 'GET',
         headers: {
+            ...window.API_CONFIG.HEADERS,
             'Authorization': `Bearer ${localStorage.getItem('token')}`
         },
         success: function(response) {
             displayRequests(response);
         },
         error: function(xhr) {
-            alert('Failed to load requests: ' + (xhr.responseJSON?.message || 'Please try again'));
+            alert(xhr.responseJSON?.message || 'Failed to load requests');
         }
     });
 }

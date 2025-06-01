@@ -1,11 +1,20 @@
 // API Configuration
 window.API_CONFIG = {
-    BASE_URL: 'https://api.lifecircle.com/api', // Production API URL
+    BASE_URL: 'https://api.lifecircle.ca/api',  // Production API URL
     TIMEOUT: 30000,
     HEADERS: {
         'Content-Type': 'application/json',
         'Accept': 'application/json'
-    }
+    },
+    CREDENTIALS: 'include',
+    DEBUG: true
+};
+
+// Environment Configuration
+window.ENV = {
+    FRONTEND_URL: 'https://beta.thelifecircle.ca',
+    API_URL: 'https://api.lifecircle.ca',
+    ENVIRONMENT: 'production'
 };
 
 // Theme Configuration
