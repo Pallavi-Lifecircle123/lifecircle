@@ -10,6 +10,9 @@ router.get('/my-requests', auth, requestController.getElderRequests);
 // Volunteer routes
 router.get('/available', auth, requestController.getAvailableRequests);
 router.post('/:requestId/assign', auth, requestController.assignVolunteer);
+router.get('/my-assignments', auth, requestController.getVolunteerAssignments);
+
+// Common routes
 router.patch('/:requestId/status', auth, requestController.updateRequestStatus);
 router.post('/:requestId/feedback', auth, requestController.addFeedback);
 

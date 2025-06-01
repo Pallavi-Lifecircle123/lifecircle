@@ -18,6 +18,11 @@ const userSchema = new mongoose.Schema({
         enum: ['elder', 'volunteer', 'admin'],
         required: true
     },
+    userType: {
+        type: String,
+        enum: ['elder', 'volunteer', 'admin'],
+        required: false
+    },
     name: {
         type: String,
         required: true
@@ -28,7 +33,8 @@ const userSchema = new mongoose.Schema({
     },
     address: {
         type: String,
-        required: true
+        required: false,
+        default: ''
     },
     createdAt: {
         type: Date,
@@ -40,6 +46,11 @@ const userSchema = new mongoose.Schema({
 userSchema.pre('save', async function(next) {
     if (!this.isModified('password')) return next();
     this.password = await bcrypt.hash(this.password, 10);
+    
+    // If userType is provided but role is not, set role from userType
+    if (this.userType && !this.role) {
+        this.role = this.userType;
+    }
     next();
 });
 

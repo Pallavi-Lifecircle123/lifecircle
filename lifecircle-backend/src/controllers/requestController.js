@@ -163,11 +163,28 @@ const addFeedback = async (req, res) => {
     }
 };
 
+// Get all requests assigned to a volunteer
+const getVolunteerAssignments = async (req, res) => {
+    try {
+        const requests = await Request.find({ 
+            assignedVolunteer: req.user._id 
+        })
+        .sort({ createdAt: -1 })
+        .populate('elderId', 'name email phone');
+
+        res.json(requests);
+    } catch (error) {
+        console.error('Error fetching volunteer assignments:', error);
+        res.status(500).json({ error: error.message });
+    }
+};
+
 module.exports = {
     createRequest,
     getElderRequests,
     getAvailableRequests,
     assignVolunteer,
     updateRequestStatus,
-    addFeedback
+    addFeedback,
+    getVolunteerAssignments
 }; 

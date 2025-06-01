@@ -5,7 +5,7 @@ const Session = require('../models/Session');
 // Register new user
 const register = async (req, res) => {
     try {
-        const { email, password, role, name, phone, address } = req.body;
+        const { email, password, role, userType, name, phone, address } = req.body;
 
         // Check if user already exists
         const existingUser = await User.findOne({ email });
@@ -17,10 +17,11 @@ const register = async (req, res) => {
         const user = new User({
             email,
             password,
-            role,
+            role: role || userType, // Use role if provided, otherwise use userType
+            userType: userType || role, // Store userType for compatibility
             name,
             phone,
-            address
+            address: address || '' // Make address optional
         });
 
         await user.save();
@@ -50,6 +51,7 @@ const register = async (req, res) => {
             token
         });
     } catch (error) {
+        console.error('Registration error:', error);
         res.status(400).json({ error: error.message });
     }
 };
