@@ -9,14 +9,18 @@ function handleLogin(event) {
     const password = $('#loginPassword').val();
     const userType = $('#loginUserType').val();
     
-    // Basic validation
-    if (!email || !password) {
-        alert('Please fill in all fields');
-        return;
+    if (window.API_CONFIG.DEBUG) {
+        console.log('Login form field values:', {
+            email: email,
+            password: password,
+            userType: userType
+        });
     }
 
-    if (window.API_CONFIG.DEBUG) {
-        console.log('Attempting login with:', { email, userType });
+    // Basic validation
+    if (!email || !password || !userType) {
+        alert('Please fill in all fields');
+        return;
     }
     
     // Make API call
@@ -35,7 +39,7 @@ function handleLogin(event) {
         beforeSend: function(xhr) {
             if (window.API_CONFIG.DEBUG) {
                 console.log('Sending login request to:', `${window.API_CONFIG.BASE_URL}/auth/login`);
-                console.log('Request headers:', xhr.getAllResponseHeaders());
+                // console.log('Request headers:', xhr.getAllResponseHeaders()); // This might cause issues with CORS preflight
             }
         },
         success: function(response) {
@@ -216,7 +220,7 @@ $(document).ready(function() {
     checkAuth();
     handleUrlParameters();
     
-    // Add form submit handlers
-    $('#registerForm').on('submit', handleRegister);
-    $('#loginForm').on('submit', handleLogin);
+    // Add form submit handlers using delegated events
+    $(document).on('submit', '#registerForm', handleRegister);
+    $(document).on('submit', '#loginForm', handleLogin);
 }); 

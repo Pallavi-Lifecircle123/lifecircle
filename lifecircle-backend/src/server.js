@@ -2,7 +2,6 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const dotenv = require('dotenv');
-const serverless = require('serverless-http');
 const authRoutes = require('./routes/auth');
 const requestRoutes = require('./routes/requests');
 const volunteerRoutes = require('./routes/volunteers');
@@ -98,29 +97,9 @@ app.use((err, req, res, next) => {
     });
 });
 
-// Lambda handler
-const handler = serverless(app);
-
 // Start server
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
     connectDB();
-});
-
-// Export handler for Lambda
-module.exports.handler = async (event, context) => {
-    // Connect to MongoDB before handling the request
-    await connectDB();
-    
-    // Add CORS headers for Lambda
-    const response = await handler(event, context);
-    return {
-        ...response,
-        headers: {
-            ...response.headers,
-            'Access-Control-Allow-Origin': '*',
-            'Access-Control-Allow-Credentials': true,
-        },
-    };
-}; 
+}); 

@@ -103,7 +103,7 @@
                     <form id="loginForm">
                         <div class="mb-3">
                             <label class="form-label">User Type</label>
-                            <select class="form-select" name="userType" required>
+                            <select class="form-select" id="loginUserType" name="userType" required>
                                 <option value="">Select user type</option>
                                 <option value="elder">Elder</option>
                                 <option value="volunteer">Volunteer</option>
@@ -111,11 +111,11 @@
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Email</label>
-                            <input type="email" class="form-control" name="email" required>
+                            <input type="email" class="form-control" id="loginEmail" name="email" required>
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Password</label>
-                            <input type="password" class="form-control" name="password" required>
+                            <input type="password" class="form-control" id="loginPassword" name="password" required>
                         </div>
                         <button type="submit" class="btn btn-primary w-100">Login</button>
                     </form>
@@ -136,7 +136,7 @@
                     <form id="registerForm">
                         <div class="mb-3">
                             <label class="form-label">User Type</label>
-                            <select class="form-select" name="userType" required>
+                            <select class="form-select" id="registerUserType" name="userType" required>
                                 <option value="">Select user type</option>
                                 <option value="elder">Elder</option>
                                 <option value="volunteer">Volunteer</option>
@@ -144,19 +144,19 @@
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Full Name</label>
-                            <input type="text" class="form-control" name="name" required>
+                            <input type="text" class="form-control" id="registerName" name="name" required>
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Email</label>
-                            <input type="email" class="form-control" name="email" required>
+                            <input type="email" class="form-control" id="registerEmail" name="email" required>
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Phone Number</label>
-                            <input type="tel" class="form-control" name="phone" required>
+                            <input type="tel" class="form-control" id="registerPhone" name="phone" required>
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Password</label>
-                            <input type="password" class="form-control" name="password" required>
+                            <input type="password" class="form-control" id="registerPassword" name="password" required>
                         </div>
                         <button type="submit" class="btn btn-primary w-100">Register</button>
                     </form>
