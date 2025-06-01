@@ -1,7 +1,6 @@
 // API Configuration
 window.API_CONFIG = {
-    BASE_URL: 'http://localhost:3000/api', // Development API URL
-    // BASE_URL: 'https://api.lifecircle.com/api', // Production API URL
+    BASE_URL: 'https://api.lifecircle.com/api', // Production API URL
     TIMEOUT: 30000,
     HEADERS: {
         'Content-Type': 'application/json',
