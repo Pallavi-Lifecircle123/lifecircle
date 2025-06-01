@@ -21,13 +21,9 @@ $('#loginForm').on('submit', function(e) {
         url: `${API_CONFIG.BASE_URL}/auth/login`,
         method: 'POST',
         headers: {
-            ...API_CONFIG.HEADERS,
+            'Content-Type': 'application/json',
             'Accept': 'application/json'
         },
-        xhrFields: {
-            withCredentials: true
-        },
-        crossDomain: true,
         data: JSON.stringify(formData),
         success: function(response) {
             // Store token and user type
@@ -70,13 +66,9 @@ $('#registerForm').on('submit', function(e) {
         url: `${API_CONFIG.BASE_URL}/auth/register`,
         method: 'POST',
         headers: {
-            ...API_CONFIG.HEADERS,
+            'Content-Type': 'application/json',
             'Accept': 'application/json'
         },
-        xhrFields: {
-            withCredentials: true
-        },
-        crossDomain: true,
         data: JSON.stringify(formData),
         success: function(response) {
             alert('Registration successful! Please login.');

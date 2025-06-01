@@ -1,18 +1,16 @@
 // API Configuration
-const API_CONFIG = {
-    BASE_URL: process.env.API_URL || 'http://localhost:3000/api',
+window.API_CONFIG = {
+    BASE_URL: 'http://localhost:3000/api', // Development API URL
+    // BASE_URL: 'https://api.lifecircle.com/api', // Production API URL
     TIMEOUT: 30000,
     HEADERS: {
         'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-        'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-        'Access-Control-Allow-Credentials': 'true'
+        'Accept': 'application/json'
     }
 };
 
 // Theme Configuration
-const THEME = {
+window.THEME = {
     COLORS: {
         PRIMARY: '#4A90E2',      // Main brand color
         SECONDARY: '#50C878',    // Success/positive actions
@@ -34,7 +32,7 @@ const THEME = {
 };
 
 // Task Types
-const TASK_TYPES = {
+window.TASK_TYPES = {
     COMPANIONSHIP: 'companionship',
     TECH_SUPPORT: 'tech_support',
     TRANSPORTATION: 'transportation',
@@ -42,7 +40,7 @@ const TASK_TYPES = {
 };
 
 // Request Status
-const REQUEST_STATUS = {
+window.REQUEST_STATUS = {
     PENDING: 'pending',
     ASSIGNED: 'assigned',
     IN_PROGRESS: 'in_progress',
@@ -51,7 +49,7 @@ const REQUEST_STATUS = {
 };
 
 // User Roles
-const USER_ROLES = {
+window.USER_ROLES = {
     ELDER: 'elder',
     VOLUNTEER: 'volunteer',
     ADMIN: 'admin'
