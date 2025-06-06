@@ -148,7 +148,7 @@ function handleRegister(event) {
             email,
             password,
             phone,
-            user_type: userType
+            role: userType
         }),
         beforeSend: function(xhr) {
             if (window.API_CONFIG.DEBUG) {

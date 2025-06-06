@@ -127,11 +127,11 @@ $('#createRequestForm').on('submit', function(e) {
     };
 
     $.ajax({
-        url: `${API_BASE_URL}/requests`,
+        url: `${window.API_CONFIG.BASE_URL}/requests`,
         method: 'POST',
         headers: {
-            'Authorization': `Bearer ${localStorage.getItem('token')}`,
-            'Content-Type': 'application/json'
+            ...window.API_CONFIG.HEADERS,
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
         },
         data: JSON.stringify(requestData),
         success: function() {
